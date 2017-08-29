@@ -58,10 +58,11 @@ class UserState extends \State\State {
 ```
 
 ```php
-$state = new UserState();
+$state = new UserState(); // This will not be updated on mutations
 $dispatcher = new \State\Dispatcher();
 
 $dispatcher->register($state);
+$dispatcher->bind(UserState::class, $bound); // $bound will be updated as states are mutated
 
 function login($username, $password) {
     $dispatcher->dispatch(LoginAction::fromUser($username, $password));
