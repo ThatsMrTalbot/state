@@ -14,7 +14,7 @@ class Dispatcher {
         }
 
         foreach ($this->bindings[$name] as &$binding) {
-            $binding = $this->instances[$name];
+            $binding = $state;
         }
     }
 
@@ -35,6 +35,7 @@ class Dispatcher {
         foreach ($classes as $class) {
             $name = get_class($class);
             $this->instances[$name] = $class;
+            $this->publish($class);
         }
     }
 
