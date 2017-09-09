@@ -5,6 +5,7 @@ namespace State;
 class Dispatcher {
     private $instances = [];
     private $bindings = [];
+    private $middleware = [];
 
     private function publish($state) {
         $name = get_class($state);
@@ -39,12 +40,27 @@ class Dispatcher {
         }
     }
 
-    public function dispatch(Action $action) {
-        foreach ($this->instances as $key => $instance) {
-            $mutated = $key::reduce($action, $instance);
+    public function addMiddleware(Middleware ...$middleware) {
+        $this->middleware = array_merge($this->middleware, $middleware);
+    }
 
-            $this->instances[$key] = $mutated;
-            $this->publish($mutated);
+    public function dispatch(Action $action) {
+        $next = function ($action) {
+            foreach ($this->instances as $key => $instance) {
+                $mutated = $key::reduce($action, $instance);
+    
+                $this->instances[$key] = $mutated;
+                $this->publish($mutated);
+            }
+        };
+
+        foreach ($this->middleware as $middleware) {
+            $middleware->setup($this, $next);
+            $next = function($action) use ($middleware) {
+                $middleware->handle($action);
+            };
         }
+
+        $next($action);
     }
 }
