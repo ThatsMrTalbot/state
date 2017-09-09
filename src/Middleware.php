@@ -11,10 +11,10 @@ abstract class Middleware {
     }
 
     protected function next(Action $action) {
-        call_user_func($this->following, $action);
+        ($this->following)($action);
     }
 
-    public function setup(Dispatcher $dispatcher, Action $action) {
+    public function setup(Dispatcher $dispatcher, \Closure $next) {
         $this->dispatcher = $dispatcher;
         $this->following = $next;
     }
