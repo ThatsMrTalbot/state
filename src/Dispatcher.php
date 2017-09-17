@@ -55,7 +55,7 @@ class Dispatcher {
         };
 
         foreach ($this->middleware as $middleware) {
-            $middleware->setup($this, $next);
+            $middleware->setup($next);
             $next = function($action) use ($middleware) {
                 $middleware->handle($action);
             };
